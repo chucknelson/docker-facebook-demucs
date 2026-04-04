@@ -25,7 +25,7 @@ ifneq ($(splittrack),)
 endif
 
 # Construct commands
-docker-run-command = docker run --rm -i \
+docker-run-command = docker run --rm -it \
 	--name=demucs \
 	$(docker-gpu-option) \
 	-v $(current-dir)input:/data/input \
