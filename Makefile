@@ -60,5 +60,5 @@ run-interactive: init build ## Run the docker container interactively to experim
 
 .PHONY:
 .SILENT:
-build: ## Build the docker image which supports running demucs with CPU only or with Nvidia CUDA on a supported GPU
+build: ## Build the CPU-first validated image with optional Nvidia CUDA passthrough on supported hosts
 	docker build -t xserrat/facebook-demucs:latest .

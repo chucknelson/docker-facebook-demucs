@@ -2,6 +2,8 @@
 This repository dockerizes [Demucs](https://github.com/adefossez/demucs)
 to split music tracks into different tracks (bass, drums, voice, others).
 
+The supported default path is CPU-first. The image keeps the current source-clone workflow pinned to Demucs commit `b9ab48c`, installs CPU PyTorch wheels from the PyTorch CPU index, and keeps `ffmpeg` in the image because Demucs and `torchaudio` still rely on it for mp3 handling.
+
 ## Usage
 ### Clone this repository
 ```bash
@@ -21,6 +23,8 @@ This process will take some time the first time it is run, as the execution will
 
 Subsequent runs will not need to download the Docker image or download the models, unless the model specified has not yet been used.
 
+The validated dependency baseline in the image is `torch==2.1.2`, `torchaudio==2.1.2`, and `numpy==1.26.4`.
+
 #### Options
 The following options are available when splitting music tracks with the `run` job:
 
@@ -39,7 +43,7 @@ Example commands:
 # Use the "fine tuned" demucs model
 make run track=mysong.mp3 model=htdemucs_ft
 
-# Enable Nvidia CUDA support and output separated audio in mp3 format
+# Enable optional Nvidia CUDA support and output separated audio in mp3 format
 make run track=mysong.mp3 gpu=true mp3output=true
 ```
 
@@ -58,6 +62,8 @@ The Docker image can be built locally via the `build` job:
 ```bash
 make build
 ```
+
+The build performs a dependency smoke check during image creation, applies a small torchaudio 2.1 compatibility patch with a `soundfile`-backed save fallback to the pinned Demucs checkout, and then runs `python3 -m demucs -d cpu test.mp3` once to verify the pinned stack, warm the default model, and confirm CPU inference still works on the checked out Demucs source revision.
 
 ## License
 This repository is released under the MIT license as found in the [LICENSE](LICENSE) file.
