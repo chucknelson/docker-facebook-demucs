@@ -1,13 +1,9 @@
 # Base image supports optional Nvidia CUDA, but the validated default path is CPU-only Demucs.
-FROM nvidia/cuda:12.6.2-base-ubuntu22.04
+FROM nvidia/cuda:13.2.0-base-ubuntu24.04
 
 USER root
 ENV TORCH_HOME=/data/models
 ENV OMP_NUM_THREADS=1
-ARG TORCH_VERSION=2.1.2
-ARG TORCHAUDIO_VERSION=2.1.2
-ARG NUMPY_VERSION=1.26.4
-ARG SOUNDFILE_VERSION=0.12.1
 
 # Install required tools
 # Notes:
@@ -18,9 +14,11 @@ RUN apt update && apt install -y --no-install-recommends \
     ffmpeg \
     git \
     libsndfile1 \
+    nano \
     python3 \
     python3-dev \
     python3-pip \
+    python3-venv \
     && rm -rf /var/lib/apt/lists/*
 
 # Clone Demucs (now maintained in the original author's github space)
@@ -29,41 +27,22 @@ WORKDIR /lib/demucs
 # Checkout known stable commit on main
 RUN git checkout b9ab48cad45976ba42b2ff17b229c071f0df9390
 
-# Keep the Dockerfile readable by applying the torchaudio 2.1 compatibility patch from a helper.
-COPY scripts/patch_demucs_for_torchaudio21.py /tmp/patch_demucs_for_torchaudio21.py
-RUN python3 /tmp/patch_demucs_for_torchaudio21.py
+# Updated and pinned python dependency requirements
+COPY demucs_override_requirements_minimal.txt requirements_minimal.txt
+COPY demucs_override_requirements.txt requirements.txt
 
-# Install a pinned CPU-first PyTorch 2 stack before the editable Demucs install.
-RUN python3 -m pip install --no-cache-dir --upgrade pip setuptools wheel \
-    && python3 -m pip install --no-cache-dir \
-        --index-url https://download.pytorch.org/whl/cpu \
-        "torch==${TORCH_VERSION}" \
-        "torchaudio==${TORCHAUDIO_VERSION}" \
-    && python3 -m pip install --no-cache-dir \
-        "numpy==${NUMPY_VERSION}" \
-        "soundfile==${SOUNDFILE_VERSION}" \
-    && python3 -m pip install --no-cache-dir -e .
+# Set up Python virtual environment, now required in Ubuntu 24.04
+ENV VIRTUAL_ENV=/opt/demucs-venv
+ENV PATH="${VIRTUAL_ENV}/bin:${PATH}"
+RUN python3 -m venv ${VIRTUAL_ENV}
 
-# Print the pinned dependency stack and verify the image resolved CPU wheels.
-RUN python3 - <<'PY'
-import demucs
-import numpy
-import torch
-import torchaudio
-
-print(f"torch={torch.__version__}")
-print(f"torchaudio={torchaudio.__version__}")
-print(f"numpy={numpy.__version__}")
-print(f"demucs_module={demucs.__file__}")
-
-if torch.version.cuda is not None:
-    raise SystemExit(f"Expected CPU-only torch wheel, found CUDA runtime {torch.version.cuda}")
-PY
+# Install dependencies
+RUN python3 -m pip install --no-cache-dir -e .
 
 # Run once to ensure demucs works and trigger the default model download
 RUN python3 -m demucs -d cpu test.mp3 
 # Cleanup output - we just used this to download the model
-RUN rm -r separated
+RUN rm -rf separated
 
 VOLUME /data/input
 VOLUME /data/output
