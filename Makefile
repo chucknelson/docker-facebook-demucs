@@ -62,10 +62,10 @@ run-interactive: init build ## Run the docker container interactively to experim
 
 .PHONY:
 .SILENT:
-build: ## Build the CPU-first validated image with optional Nvidia CUDA passthrough on supported hosts
+build: ## Build the docker image which supports running demucs with CPU only or with Nvidia CUDA on a supported GPU
 	$(docker-build-command) .
 
 .PHONY:
 .SILENT:
-build-clean: ## Build the CPU-first validated image with optional Nvidia CUDA passthrough on supported hosts
+build-clean: ## Build the docker image without docker cache
 	$(docker-build-command) --no-cache .

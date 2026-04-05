@@ -1,4 +1,4 @@
-# Base image supports optional Nvidia CUDA, but the validated default path is CPU-only Demucs.
+# Base image supports Nvidia CUDA but does not require it and can also run demucs on the CPU
 FROM nvidia/cuda:13.2.0-base-ubuntu24.04
 
 USER root
@@ -13,7 +13,6 @@ RUN apt update && apt install -y --no-install-recommends \
     build-essential \
     ffmpeg \
     git \
-    libsndfile1 \
     nano \
     python3 \
     python3-dev \
@@ -27,7 +26,7 @@ WORKDIR /lib/demucs
 # Checkout known stable commit on main
 RUN git checkout b9ab48cad45976ba42b2ff17b229c071f0df9390
 
-# Updated and pinned python dependency requirements
+# Updated and pinned python dependency requirements for demucs
 COPY demucs_override_requirements_minimal.txt requirements_minimal.txt
 COPY demucs_override_requirements.txt requirements.txt
 

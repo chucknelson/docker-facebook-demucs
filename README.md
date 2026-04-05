@@ -39,7 +39,7 @@ Example commands:
 # Use the "fine tuned" demucs model
 make run track=mysong.mp3 model=htdemucs_ft
 
-# Enable optional Nvidia CUDA support and output separated audio in mp3 format
+# Enable Nvidia CUDA support and output separated audio in mp3 format
 make run track=mysong.mp3 gpu=true mp3output=true
 ```
 
