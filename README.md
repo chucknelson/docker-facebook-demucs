@@ -63,6 +63,11 @@ The Docker image can be built locally via the `build` job:
 make build
 ```
 
+To force Docker to rebuild without using layer cache:
+```bash
+make build-clean
+```
+
 The build performs a dependency smoke check during image creation, applies a small torchaudio 2.1 compatibility patch with a `soundfile`-backed save fallback to the pinned Demucs checkout, and then runs `python3 -m demucs -d cpu test.mp3` once to verify the pinned stack, warm the default model, and confirm CPU inference still works on the checked out Demucs source revision.
 
 ## License

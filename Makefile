@@ -25,6 +25,8 @@ ifneq ($(splittrack),)
 endif
 
 # Construct commands
+docker-build-command = docker build -t xserrat/facebook-demucs:latest
+
 docker-run-command = docker run --rm -it \
 	--name=demucs \
 	$(docker-gpu-option) \
@@ -61,4 +63,9 @@ run-interactive: init build ## Run the docker container interactively to experim
 .PHONY:
 .SILENT:
 build: ## Build the CPU-first validated image with optional Nvidia CUDA passthrough on supported hosts
-	docker build -t xserrat/facebook-demucs:latest .
+	$(docker-build-command) .
+
+.PHONY:
+.SILENT:
+build-clean: ## Build the CPU-first validated image with optional Nvidia CUDA passthrough on supported hosts
+	$(docker-build-command) --no-cache .
