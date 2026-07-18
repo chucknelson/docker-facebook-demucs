@@ -27,7 +27,7 @@ The following options are available when splitting music tracks with the `run` j
 Option | Default Value | Description
 --- | --- | ---
 `gpu`           | `false` | Enable Nvidia CUDA support (requires an Nvidia GPU).
-`model`         | `demucs`| The model used for audio separation. See https://github.com/facebookresearch/demucs#separating-tracks for a list of available models to use.
+`model`         | `htdemucs`| The model used for audio separation. See https://github.com/facebookresearch/demucs#separating-tracks for a list of available models to use.
 `mp3output`     | `false` | Output separated audio in `mp3` format instead of the default `wav` format.
 `shifts`        | `1`     | Perform multiple predictions with random shifts (a.k.a the shift trick) of the input and average them. This makes prediction `SHIFTS` times slower. Don't use it unless you have a GPU.
 `overlap`       | `0.25`  | Control the amount of overlap between prediction windows. Default is 0.25 (i.e. 25%) which is probably fine. It can probably be reduced to 0.1 to improve separation speed.
